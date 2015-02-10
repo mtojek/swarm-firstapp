@@ -7,7 +7,7 @@
         {
           "component_name": "webserver",
           "image": "registry.giantswarm.io/$username/currentweather:latest",
-          "ports": ["8080/tcp"],
+          "ports": [8080],
           "dependencies": [
             {
               "name": "redis",
@@ -15,13 +15,13 @@
             }
           ],
           "domains": {
-            "currentweather-$username.gigantic.io": "8080"
+            "currentweather-$username.gigantic.io": 8080
           }
         },
         {
           "component_name": "redis",
           "image": "redis:latest",
-          "ports": ["6379/tcp"]
+          "ports": [6379]
         }
       ]
     }
