@@ -64,7 +64,7 @@ func getWeatherReport(query string) (WeatherReport, error) {
 		return report, err
 	}
 
-	if json.Unmarshal(data, &report); err != nil {
+	if err = json.Unmarshal(data, &report); err != nil {
 		return report, err
 	}
 
