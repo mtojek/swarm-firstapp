@@ -16,7 +16,13 @@ http://docs.giantswarm.io/guides/your-first-application/golang/
 The application logic is implemented in [main.go](main.go). It starts a webserver and on root request pings the [openweather API](http://api.openweathermap.org/data/2.5/weather?q=Cologne) caches the result in Redis and extracts and returns the current weather for Cologne.
 
 ## Run in locally
-To run it locally you just have to do a `make fig-up. This:
+To run it locally you just have to do a 
+
+```
+make fig-up
+```
+
+This
 * builds the Go project into a linux binary
 * creates a custom Docker image with the linux binary
 * starts both the custom Docker container and a Redis container.
@@ -24,7 +30,13 @@ To run it locally you just have to do a `make fig-up. This:
 To test it on a Mac run something like: `curl $(boot2docker ip):8080` 
 
 ## Run in on Giant Swarm
-To deploy it on Giant Swarm you just have to do a 'make swarm-up'. This:
+To deploy it on Giant Swarm you just have to do a 
+
+```
+make swarm-up
+```
+
+This
 * builds appropriate Docker images
 * uploads them to the Giant Swarm registry
 * uploads the `swarm.json` and starts the application.
