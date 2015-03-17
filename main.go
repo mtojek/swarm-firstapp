@@ -84,7 +84,7 @@ func getWeatherReportData(query string) ([]byte, error) {
 	var data []byte
 
 	if query == "" {
-		query = "Cologne"
+		query = "Cologne,DE"
 	}
 
 	resp, err := http.Get("http://api.openweathermap.org/data/2.5/weather?q=" + url.QueryEscape(query))
