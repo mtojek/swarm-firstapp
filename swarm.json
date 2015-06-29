@@ -6,7 +6,7 @@
       "components": [
         {
           "component_name": "webserver",
-          "image": "registry.giantswarm.io/$username/currentweather:latest",
+          "image": "registry.giantswarm.io/$username/currentweather-go:latest",
           "ports": [8080],
           "dependencies": [
             {
