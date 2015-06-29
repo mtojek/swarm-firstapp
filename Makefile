@@ -1,6 +1,4 @@
-# Here we define some variables to be used within
-# the Makefile.
-
+# Variables to be used within the Makefile
 GIANTSWARM_USERNAME := $(shell swarm user)
 GO_SOURCE := $(shell find . -name '*.go')
 GO_PATH := $(shell pwd)/.gobuild
