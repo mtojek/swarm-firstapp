@@ -1,67 +1,73 @@
-PROJECT=currentweather
-ORGANIZATION=giantswarm
-REGISTRY = registry.giantswarm.io
-USERNAME := $(shell swarm user)
+# Here we define some variables to be used within
+# the Makefile.
 
-SOURCE := $(shell find . -name '*.go')
-GOPATH := $(shell pwd)/.gobuild
-PROJECT_PATH := $(GOPATH)/src/github.com/$(ORGANIZATION)
-GOOS := linux
-GOARCH := amd64
+GIANTSWARM_USERNAME := $(shell swarm user)
+GO_SOURCE := $(shell find . -name '*.go')
+GO_PATH := $(shell pwd)/.gobuild
+GO_PROJECT_PATH := $(GO_PATH)/src/github.com/giantswarm
 
-.PHONY=all clean deps $(PROJECT) swarm-up docker-build docker-push docker-pull
+# Phony targets are all targets which have names that
+# do not resemble some file or folder being generated
+# as a result
+.PHONY=all clean deps currentweather swarm-up docker-build docker-push
 
-all: deps $(PROJECT)
-
-clean:
-	rm -rf $(GOPATH) $(PROJECT)
+# The default target when you issue 'make'
+all: deps currentweather
 
 deps: .gobuild
 .gobuild:
-	mkdir -p $(PROJECT_PATH)
-	cd $(PROJECT_PATH) && ln -s ../../../.. $(PROJECT)
-
-	# Fetch private packages first (so `go get` skips them later)
-	# git clone git@github.com:giantswarm/example.git $(PROJECT_PATH)/example
+	mkdir -p $(GO_PROJECT_PATH)
+	cd $(GO_PROJECT_PATH) && ln -s ../../../.. currentweather
 
 	# Fetch public packages
-	GOPATH=$(GOPATH) go get -d github.com/$(ORGANIZATION)/$(PROJECT)
+	GOPATH=$(GO_PATH) go get -d github.com/giantswarm/currentweather
 
-$(PROJECT): $(SOURCE) 
-	echo Building for $(GOOS)/$(GOARCH)
+# Compiling the Golang binary for Linux from main.go and libraries.
+# We actually use another Docker container for this to ensure
+# this works even on non-Linux systems.
+currentweather: $(GO_SOURCE) 
+	echo Building for linux/amd64
 	docker run \
 	    --rm \
 	    -it \
 	    -v $(shell pwd):/usr/code \
 	    -e GOPATH=/usr/code/.gobuild \
-	    -e GOOS=$(GOOS) \
-	    -e GOARCH=$(GOARCH) \
+	    -e GOOS=linux \
+	    -e GOARCH=amd64 \
 	    -w /usr/code \
-	    golang:1.3.1-cross \
-	    go build -a -o $(PROJECT)
+	    golang:1.4 \
+	    go build -a -o currentweather
 
-fig-up: $(PROJECT)
-	fig build
-	fig up
+# Building your custom docker image
+docker-build: currentweather
+	docker build -t registry.giantswarm.io/$(GIANTSWARM_USERNAME)/currentweather-go .
 
-docker-build: $(PROJECT)
-	docker build -t $(REGISTRY)/$(USERNAME)/$(PROJECT) .
-
-docker-push: docker-build
-	docker push $(REGISTRY)/$(USERNAME)/$(PROJECT)
-
-docker-pull:
-	docker pull redis
-	docker pull $(REGISTRY)/$(USERNAME)/$(PROJECT)
-
+# Starting redis container to run in the background
 docker-run-redis:
 	docker run --name=redis -d redis
 
-docker-run: docker-build
-	docker run --link redis:redis -p 8080:8080 -ti --rm $(REGISTRY)/$(USERNAME)/$(PROJECT)
+# Testing your custom-built docker image locally
+docker-run:
+	docker run --link redis:redis -p 8080:8080 \
+		-ti --rm --name currentweather-go-container \
+		registry.giantswarm.io/$(GIANTSWARM_USERNAME)/currentweather-go
 
+# Pushing the freshly built image to the registry
+docker-push:
+	docker push registry.giantswarm.io/$(GIANTSWARM_USERNAME)/currentweather-go
+
+# Starting your application on Giant Swarm.
+# Requires prior pushing to the registry ('make docker-push')
+swarm-up:
+	swarm up swarm.json --var=username=$(GIANTSWARM_USERNAME)
+
+# Removing your application again from Giant Swarm
+# to free resources. Also required before changing
+# the swarm.json file and re-issueing 'swarm up'
 swarm-delete:
-	swarm delete $(PROJECT)
+	swarm delete currentweather
 
-swarm-up: docker-push
-	swarm up swarm.json --var=username=$(USERNAME)
+# To remove the stuff we built locally afterwards
+clean:
+	rm -rf $(GO_PATH) currentweather
+	docker rmi -f registry.giantswarm.io/$(GIANTSWARM_USERNAME)/currentweather-go
