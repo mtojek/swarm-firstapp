@@ -44,11 +44,11 @@ docker-build: currentweather
 
 # Starting redis container to run in the background
 docker-run-redis:
-	docker run --name=redis -d redis
+	docker run --name=currentweather-redis-container -d redis
 
 # Testing your custom-built docker image locally
 docker-run:
-	docker run --link redis:redis -p 8080:8080 \
+	docker run --link currentweather-redis-container:redis -p 8080:8080 \
 		-ti --rm --name currentweather-go-container \
 		registry.giantswarm.io/$(GIANTSWARM_USERNAME)/currentweather-go
 
