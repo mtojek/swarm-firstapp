@@ -4,9 +4,6 @@ GO_SOURCE := $(shell find . -name '*.go')
 GO_PATH := $(shell pwd)/.gobuild
 GO_PROJECT_PATH := $(GO_PATH)/src/github.com/giantswarm
 
-# Phony targets are all targets which have names that
-# do not resemble some file or folder being generated
-# as a result
 .PHONY=all clean deps currentweather swarm-up docker-build docker-push
 
 # The default target when you issue 'make'
