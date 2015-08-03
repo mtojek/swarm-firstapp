@@ -20,18 +20,18 @@ deps: .gobuild
 # Compiling the Golang binary for Linux from main.go and libraries.
 # We actually use another Docker container for this to ensure
 # this works even on non-Linux systems.
-currentweather: $(GO_SOURCE) 
+currentweather: $(GO_SOURCE)
 	echo Building for linux/amd64
 	docker run \
-	    --rm \
-	    -it \
-	    -v $(shell pwd):/usr/code \
-	    -e GOPATH=/usr/code/.gobuild \
-	    -e GOOS=linux \
-	    -e GOARCH=amd64 \
-	    -w /usr/code \
-	    golang:1.4 \
-	    go build -a -o currentweather
+		--rm \
+		-it \
+		-v $(shell pwd):/usr/code \
+		-e GOPATH=/usr/code/.gobuild \
+		-e GOOS=linux \
+		-e GOARCH=amd64 \
+		-w /usr/code \
+		golang:1.4 \
+		go build -a -o currentweather
 
 # Building your custom docker image
 docker-build: currentweather
