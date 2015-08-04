@@ -1,4 +1,4 @@
-# Getting started with Go, Docker, Redis on Giant Swarm
+# Getting started with Go, Docker, and Redis on Giant Swarm
 
 This is a simple example that demonstrates how to write a microservice in Golang and deploy it on [Giant Swarm](https://giantswarm.io/). It pings an external API and caches the data in an Redis cache.
 
