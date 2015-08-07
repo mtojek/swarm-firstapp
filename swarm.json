@@ -11,7 +11,7 @@
         }
       ],
       "domains": {
-        "currentweather-$GIANTSWARM_LOGIN_NAME.gigantic.io": "8080"
+        "8080": "currentweather-$GIANTSWARM_LOGIN_NAME.gigantic.io"
       }
     },
     "redis": {
