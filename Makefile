@@ -20,18 +20,18 @@ deps: .gobuild
 # Compiling the Golang binary for Linux from main.go and libraries.
 # We actually use another Docker container for this to ensure
 # this works even on non-Linux systems.
-currentweather: $(GO_SOURCE) 
+currentweather: $(GO_SOURCE)
 	echo Building for linux/amd64
 	docker run \
-	    --rm \
-	    -it \
-	    -v $(shell pwd):/usr/code \
-	    -e GOPATH=/usr/code/.gobuild \
-	    -e GOOS=linux \
-	    -e GOARCH=amd64 \
-	    -w /usr/code \
-	    golang:1.4 \
-	    go build -a -o currentweather
+		--rm \
+		-it \
+		-v $(shell pwd):/usr/code \
+		-e GOPATH=/usr/code/.gobuild \
+		-e GOOS=linux \
+		-e GOARCH=amd64 \
+		-w /usr/code \
+		golang:1.4 \
+		go build -a -o currentweather
 
 # Building your custom docker image
 docker-build: currentweather
@@ -39,7 +39,9 @@ docker-build: currentweather
 
 # Starting redis container to run in the background
 docker-run-redis:
-	docker run --name=currentweather-redis-container -d redis
+	@docker kill currentweather-redis-container > /dev/null || true
+	@docker rm currentweather-redis-container > /dev/null || true
+	docker run -d --name currentweather-redis-container redis
 
 # Running your custom-built docker image locally
 docker-run:
@@ -51,12 +53,12 @@ docker-run:
 docker-push:
 	docker push registry.giantswarm.io/$(GIANTSWARM_USERNAME)/currentweather-go
 
-# Starting your application on Giant Swarm.
+# Starting your service on Giant Swarm.
 # Requires prior pushing to the registry ('make docker-push')
 swarm-up:
-	swarm up swarm.json --var=username=$(GIANTSWARM_USERNAME)
+	swarm up
 
-# Removing your application again from Giant Swarm
+# Removing your service again from Giant Swarm
 # to free resources. Also required before changing
 # the swarm.json file and re-issueing 'swarm up'
 swarm-delete:
