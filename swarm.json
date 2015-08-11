@@ -1,12 +1,12 @@
 {
   "name": "currentweather",
-  "nodes": {
+  "components": {
     "webserver": {
       "image": "registry.giantswarm.io/$GIANTSWARM_LOGIN_NAME/currentweather-go:latest",
       "ports": [8080],
       "links": [
         {
-          "node": "redis",
+          "component": "redis",
           "target_port": 6379
         }
       ],
