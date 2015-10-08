@@ -30,7 +30,7 @@ currentweather: $(GO_SOURCE)
 		-e GOOS=linux \
 		-e GOARCH=amd64 \
 		-w /usr/code \
-		golang:1.4 \
+		golang:1.5.1 \
 		go build -a -o currentweather
 
 # Building your custom docker image
